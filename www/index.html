@@ -8,7 +8,7 @@
   <style>
     .angular-google-map-container {
       width: 100%;
-      height: 504px;
+      height: 500px;
     }
   </style>
 
@@ -16,6 +16,7 @@
     <script src="lib/ionic/js/ionic.bundle.js"></script>
     <link href="lib/ionic-datepicker-widget/dist/ionic-datepicker.css" rel="stylesheet">
     <script src="lib/ionic-datepicker-widget/dist/ionic-datepicker.min.js"></script>
+      <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyDndNy5dLdL8ZvINZ4msL4RN75k9LZO73Y&sensor=true"></script>
 
   <link href="http://code.ionicframework.com/ionicons/1.5.2/css/ionicons.min.css" rel="stylesheet">
 
@@ -39,6 +40,29 @@
 
     .controller('DateController', ['$scope', function ($scope) {
     }])
+
+    .controller('MapController', function($scope, $ionicLoading) {
+      var myLatlng = new google.maps.LatLng(37.3000, -120.4833);
+
+      var mapOptions = {
+          center: myLatlng,
+          zoom: 16,
+          mapTypeId: google.maps.MapTypeId.ROADMAP
+      };
+
+      var map = new google.maps.Map(document.getElementById("map"), mapOptions);
+      navigator.geolocation.getCurrentPosition(function(pos) {
+          map.setCenter(new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
+          var myLocation = new google.maps.Marker({
+              position: new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude),
+              map: map,
+              title: "My Location"
+          });
+      });
+
+      $scope.map = map;
+     
+    })
 
     .controller('IntroductionController', ['$scope', function ($scope) {
       $scope.myActiveSlide = 1;
@@ -92,6 +116,11 @@
         templateUrl: 'symptoms.html'
       })
 
+      .state('map', {
+        url: '/map',
+        templateUrl: 'map.html'
+      })
+
       .state('symptoms_detail', {
         url: '/symptoms_detail',
         templateUrl: 'symptoms_detail.html',
@@ -133,6 +162,14 @@ i.big-icon {
   font-size:1500%;
   text-align:center;
   display:block;
+}
+scroll {
+    height: 100%;
+}
+ 
+#map {
+    width: 100%;
+    height: 700px;
 }
 </style>
 
@@ -313,7 +350,7 @@ i.big-icon {
       <ion-content padding="true" scroll="false" class="has-header">
         <h2>Today’s News</h2>
         <a href="/#survey" class="button icon-left ion-checkmark button-full">Report</a>
-        <a class="button icon-left ion-ios-location button-full">Maps</a>
+        <a href="/#map" class="button icon-left ion-ios-location button-full">Maps</a>
         <a href="/#health_info" class="button icon-left ion-ios-pulse-strong button-full">Health Info</a>
         <a class="button icon-left ion-briefcase button-full">Event Info</a>
         <a class="button icon-left ion-podium button-full">Your stats</a>
@@ -362,10 +399,16 @@ i.big-icon {
               <a href="#signup" class="button button-positive button-full">Get Started</a>
             </div>
           </ion-slide>
-
         </ion-slide-box>
       </ion-content>
     </ion-view>
   </script>
+
+<script id="map.html" type="text/ng-template">
+<ion-view title="Health Olimpix">
+  <ion-content ng-controller="MapController">
+      <div id="map" data-tap-disabled="true"></div>
+  </ion-content>
+</script>
 </body>
 </html>
